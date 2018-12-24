@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GoNe</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <string name="keyword_management_activity_title">キーワード編集</string>
+
+    <string name="loading">loading…</string>
+    <string name="loading_fail">記事の読み込みに失敗しました</string>
+    <string name="loading_not_found">該当する記事が見つかりませんでした</string>
+    <string name="reorder">並べ替え</string>
+    <string name="clear">削除</string>
+    <string name="save">保存</string>
+    <string name="add_item">項目を追加</string>
+    <string name="add">追加</string>
+    <string name="cancel">キャンセル</string>
+    <string name="confirm">確認</string>
+    <string name="delete">削除</string>
+
+    <string name="section_title_keyword">キーワード</string>
+    <string name="section_title_topics">トピックス</string>
+</resources>
