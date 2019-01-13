@@ -1,46 +1,50 @@
-package net.halawata.gone
+package net.halawata.gone.fragment
 
 import android.app.Dialog
-import android.support.v7.app.AppCompatActivity
+import android.content.Context
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.DialogFragment
+import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.view.Menu
-import android.view.MenuItem
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_keyword_management.*
+import net.halawata.gone.R
 import net.halawata.gone.entity.KeywordItem
 import net.halawata.gone.entity.KeywordType
-import net.halawata.gone.service.DatabaseHelper
 import net.halawata.gone.service.CustomKeywordsService
+import net.halawata.gone.service.DatabaseHelper
 import net.halawata.gone.service.ReadArticleService
 import net.halawata.gone.view.DividerItemDecoration
 import net.halawata.gone.view.KeywordRecyclerViewAdapter
 
-class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
+class KeywordManagementFragment : Fragment(), View.OnClickListener {
 
+    private var keywordsService: CustomKeywordsService? = null
+    private var readArticleService: ReadArticleService? = null
     private var deletedItem = mutableListOf<String>()
 
-    private lateinit var readArticleService: ReadArticleService
-    private lateinit var keywordsService: CustomKeywordsService
     private lateinit var keywordRecyclerViewAdapter: KeywordRecyclerViewAdapter
+    private lateinit var keywordRecyclerView: RecyclerView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_keyword_management)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
 
-        supportActionBar?.title = getString(R.string.keyword_management_activity_title)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_white_24)
-
-        val helper = DatabaseHelper(this)
+        val helper = DatabaseHelper(context)
         keywordsService = CustomKeywordsService(helper)
         readArticleService = ReadArticleService(helper)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.fragment_keyword_management, container, false)
+        val activity = activity ?: return view
+        val keywordsService = keywordsService ?: return view
 
         keywordRecyclerViewAdapter = object : KeywordRecyclerViewAdapter(keywordsService.getAll()) {
             /**
@@ -53,15 +57,16 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
                 }
 
                 dialog.arguments = arguments
-                dialog.show(supportFragmentManager, KeywordClearFragment::class.java.simpleName)
+                dialog.show(childFragmentManager, KeywordClearFragment::class.java.simpleName)
             }
         }
 
-        val linearLayoutManager = LinearLayoutManager(this)
+        val linearLayoutManager = LinearLayoutManager(activity)
 
+        keywordRecyclerView = view.findViewById(R.id.keywordRecyclerView)
         keywordRecyclerView.layoutManager = linearLayoutManager
         keywordRecyclerView.adapter = keywordRecyclerViewAdapter
-        keywordRecyclerView.addItemDecoration(DividerItemDecoration(this))
+        keywordRecyclerView.addItemDecoration(DividerItemDecoration(activity))
 
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT) {
             /**
@@ -90,20 +95,30 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
 
         itemTouchHelper.attachToRecyclerView(keywordRecyclerView)
 
+        val keywordAddButton = view.findViewById<FloatingActionButton>(R.id.keywordAddButton)
         keywordAddButton.setOnClickListener(this)
+
+        return view
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item?.itemId) {
-            // 画面上の戻るボタンタップ時
-            android.R.id.home -> {
-                finish()
-                true
-            }
-            else -> {
-                super.onOptionsItemSelected(item)
-            }
+    override fun onStop() {
+        super.onStop()
+
+        // 保存
+        try {
+            keywordsService?.updateAll(keywordRecyclerViewAdapter.data)
+            readArticleService?.deleteKeywords(deletedItem.distinct())
+
+        } catch (ex: Exception) {
+            showMessage("保存に失敗しました")
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+
+        keywordsService = null
+        readArticleService = null
     }
 
     /**
@@ -111,23 +126,7 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
      */
     override fun onClick(view: View?) {
         val dialog = KeywordAdditionFragment()
-        dialog.show(supportFragmentManager, KeywordAdditionFragment::class.java.simpleName)
-    }
-
-    /**
-     * 戻るボタンタップ時
-     */
-    override fun finish() {
-        // 戻るときに保存する
-        try {
-            keywordsService.updateAll(keywordRecyclerViewAdapter.data)
-            readArticleService.deleteKeywords(deletedItem.distinct())
-
-        } catch (ex: Exception) {
-            showMessage("保存に失敗しました")
-        }
-
-        super.finish()
+        dialog.show(childFragmentManager, KeywordAdditionFragment::class.java.simpleName)
     }
 
     /**
@@ -155,7 +154,8 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
      * メッセージ表示
      */
     private fun showMessage(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        val activity = activity ?: return
+        Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
     }
 
     /**
@@ -164,7 +164,7 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
     class KeywordAdditionFragment : DialogFragment() {
 
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            val activity = activity as? KeywordManagementActivity ?: return super.onCreateDialog(savedInstanceState)
+            val fragment = parentFragment as? KeywordManagementFragment ?: return super.onCreateDialog(savedInstanceState)
             val context = context ?: return super.onCreateDialog(savedInstanceState)
             val builder = AlertDialog.Builder(context)
             val view = View.inflate(context, R.layout.fragment_keyword_addition, null)
@@ -176,7 +176,7 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
                         val editText = view.findViewById<EditText>(R.id.keywordAdditionEditText)
                         val keyword = editText.text.toString()
 
-                        activity.onKeywordAddition(keyword)
+                        fragment.onKeywordAddition(keyword)
                     }
                     .setNegativeButton(getString(R.string.cancel), null)
 
@@ -190,7 +190,7 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
     class KeywordClearFragment : DialogFragment() {
 
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            val activity = activity as? KeywordManagementActivity ?: return super.onCreateDialog(savedInstanceState)
+            val fragment = parentFragment as? KeywordManagementFragment ?: return super.onCreateDialog(savedInstanceState)
             val context = context ?: return super.onCreateDialog(savedInstanceState)
             val builder = AlertDialog.Builder(context)
 
@@ -199,7 +199,7 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
                     .setMessage(getString(R.string.confirm_delete))
                     .setPositiveButton(getString(R.string.delete)) { _, _ ->
                         arguments?.getInt("position")?.let {
-                            activity.onKeywordClear(it)
+                            fragment.onKeywordClear(it)
                         }
                     }
                     .setNegativeButton(getString(R.string.cancel), null)

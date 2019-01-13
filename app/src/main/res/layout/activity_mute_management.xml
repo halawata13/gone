@@ -4,10 +4,11 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".KeywordManagementActivity">
+        tools:context=".activity.KeywordManagementActivity">
 
-    <android.support.v7.widget.RecyclerView
-            android:id="@+id/muteRecyclerView"
+    <fragment
+            android:name="net.halawata.gone.fragment.MuteManagementFragment"
+            android:id="@+id/muteManagementFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

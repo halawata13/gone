@@ -1,4 +1,4 @@
-package net.halawata.gone
+package net.halawata.gone.fragment
 
 import android.content.Context
 import android.os.Bundle
@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_message.*
+import net.halawata.gone.R
 
 class MessageFragment : Fragment() {
     private var message: String? = null

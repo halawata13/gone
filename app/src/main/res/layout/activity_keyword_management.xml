@@ -4,22 +4,12 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".KeywordManagementActivity">
+        tools:context=".activity.KeywordManagementActivity">
 
-    <android.support.v7.widget.RecyclerView
-            android:id="@+id/keywordRecyclerView"
+    <fragment
+            android:name="net.halawata.gone.fragment.KeywordManagementFragment"
+            android:id="@+id/keywordManagementFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="50dp" />
-
-    <android.support.design.widget.FloatingActionButton
-            android:id="@+id/keywordAddButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_margin="16dp"
-            android:tint="#ffffff"
-            android:src="@drawable/ic_baseline_add_24px" />
+            android:layout_height="match_parent" />
 
 </RelativeLayout>

@@ -5,7 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/drawerLayout"
-        tools:context=".MainActivity">
+        tools:context=".activity.MainActivity">
 
     <RelativeLayout
             android:id="@+id/content"
@@ -14,22 +14,18 @@
             android:orientation="vertical">
 
         <fragment
+                android:name="net.halawata.gone.fragment.ListFragment"
+                android:id="@+id/listFragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:name="net.halawata.gone.ListFragment"
-                android:id="@+id/listFragment" />
+                android:layout_height="match_parent" />
 
     </RelativeLayout>
 
-    <ExpandableListView
-            android:id="@+id/drawerListView"
-            android:layout_width="240dp"
-            android:layout_height="match_parent"
+    <fragment
+            android:name="net.halawata.gone.fragment.SideMenuFragment"
+            android:id="@+id/sideMenuFragment"
             android:layout_gravity="start"
-            android:choiceMode="singleChoice"
-            android:groupIndicator="@null"
-            android:divider="#eeeeee"
-            android:dividerHeight="1dp"
-            android:background="#ffffff" />
+            android:layout_width="240dp"
+            android:layout_height="match_parent" />
 
 </android.support.v4.widget.DrawerLayout>

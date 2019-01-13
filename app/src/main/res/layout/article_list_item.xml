@@ -9,20 +9,12 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 
-    <net.halawata.gone.view.RoundClipFrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:cornerRadius="3dp">
-
-        <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:id="@+id/thumbs"
-                android:layout_marginEnd="8dp"
-                android:contentDescription="@string/thumbs"/>
-
-    </net.halawata.gone.view.RoundClipFrameLayout>
-
+    <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:id="@+id/thumbs"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@string/thumbs"/>
 
     <LinearLayout
             android:orientation="vertical"

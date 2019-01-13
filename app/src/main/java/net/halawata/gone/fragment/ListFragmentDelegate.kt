@@ -1,4 +1,4 @@
-package net.halawata.gone
+package net.halawata.gone.fragment
 
 import net.halawata.gone.entity.Article
 

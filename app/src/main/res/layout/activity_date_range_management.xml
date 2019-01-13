@@ -4,13 +4,12 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".DateRangeManagementActivity">
+        tools:context=".activity.DateRangeManagementActivity">
 
-    <ListView
-            android:id="@+id/dateRangeListView"
+    <fragment
+            android:name="net.halawata.gone.fragment.DateRangeManagementFragment"
+            android:id="@+id/dateRangeManagementFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-    </ListView>
+            android:layout_height="match_parent" />
 
 </LinearLayout>

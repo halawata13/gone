@@ -6,10 +6,11 @@
         android:layout_height="match_parent"
         tools:context=".activity.ConfigActivity">
 
-    <fragment
-            android:name="net.halawata.gone.fragment.ConfigFragment"
-            android:id="@+id/configFragment"
+    <ListView
+            android:id="@+id/configListView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+    </ListView>
 
 </LinearLayout>
