@@ -20,6 +20,12 @@
         </activity>
         <activity android:name=".KeywordManagementActivity">
         </activity>
+        <activity android:name=".ConfigActivity">
+        </activity>
+        <activity android:name=".MuteManagementActivity">
+        </activity>
+        <activity android:name=".DateRangeManagementActivity">
+        </activity>
     </application>
 
 </manifest>

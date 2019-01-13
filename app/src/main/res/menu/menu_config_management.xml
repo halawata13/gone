@@ -4,7 +4,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/keywordManagementMenuSaveItem"
+        android:id="@+id/configManagementMenuSaveItem"
         android:title="@string/save"
         app:showAsAction="always" />
 

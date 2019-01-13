@@ -4,6 +4,7 @@ import net.halawata.gone.entity.GnewsArticle
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.StringReader
+import java.net.URL
 import java.net.URLEncoder
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -22,13 +23,16 @@ object GnewsService {
 
         val articles = ArrayList<GnewsArticle>()
         var id: Long = 0
-        var title = ""
-        var url = ""
-        var guid = ""
-        var pubDate = ""
 
         try {
             while (eventType != XmlPullParser.END_DOCUMENT) {
+                var title = ""
+                var url = ""
+                var host = ""
+                var thumbsUrlString: String? = null
+                var guid = ""
+                var pubDate = ""
+
                 // item タグ開始が来るまでスキップ
                 if (eventType != XmlPullParser.START_TAG || parser.name != "item") {
                     eventType = parser.next()
@@ -50,6 +54,7 @@ object GnewsService {
                         while (eventType != XmlPullParser.END_TAG || parser.name != "link") {
                             if (eventType == XmlPullParser.TEXT) {
                                 url = parser.text
+                                host = URL(url).host
                             }
 
                             eventType = parser.next()
@@ -76,6 +81,15 @@ object GnewsService {
                         }
                     }
 
+                    if (eventType == XmlPullParser.START_TAG && parser.name == "media:content") {
+                        for (i in 0 until parser.attributeCount) {
+                            if (parser.getAttributeName(i) == "url") {
+                                thumbsUrlString = parser.getAttributeValue(i)
+                                break
+                            }
+                        }
+                    }
+
                     eventType = parser.next()
                 }
 
@@ -83,6 +97,8 @@ object GnewsService {
                         id = id++,
                         title = title,
                         url = url,
+                        host = host,
+                        thumbsUrlString = thumbsUrlString,
                         pubDate = pubDate,
                         guid = guid
                 )
@@ -99,15 +115,6 @@ object GnewsService {
         articles.sortByDescending { article -> article.pubDate }
 
         return articles
-    }
-
-    fun getUrlString(keyword: String): String {
-        if (keyword == "新着エントリー") {
-            return "https://news.google.com/news/rss/headlines/section/topic/SCITECH.ja_jp/%E3%83%86%E3%82%AF%E3%83%8E%E3%83%AD%E3%82%B8%E3%83%BC?ned=jp&hl=ja&gl=JP"
-        }
-
-        val escaped = URLEncoder.encode(keyword, "UTF-8")
-        return "https://news.google.com/news/rss/headlines/section/q/$escaped/$escaped?ned=jp&amp;hl=ja&gl=JP"
     }
 
     private fun formatDate(dateString: String): String? {

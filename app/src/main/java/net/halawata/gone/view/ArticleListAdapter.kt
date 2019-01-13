@@ -6,12 +6,14 @@ import android.support.v4.content.ContextCompat
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.TextView
-import net.halawata.gone.entity.Article
+import com.squareup.picasso.Picasso
 import net.halawata.gone.R
+import net.halawata.gone.entity.GnewsArticle
 import kotlin.collections.ArrayList
 
-class ArticleListAdapter<T: Article>(val context: Context, var data: ArrayList<T>, val resource: Int): BaseAdapter() {
+class ArticleListAdapter(val context: Context, var data: ArrayList<GnewsArticle>, val resource: Int) : BaseAdapter() {
 
     override fun getCount(): Int = data.size
 
@@ -21,22 +23,32 @@ class ArticleListAdapter<T: Article>(val context: Context, var data: ArrayList<T
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val activity = context as Activity
-        val item = getItem(position) as Article
-
+        val article = getItem(position) as GnewsArticle
         val view = convertView ?: activity.layoutInflater.inflate(resource, null)
 
-        (view.findViewById(R.id.pubDate) as TextView).text = item.pubDate
-        (view.findViewById(R.id.title) as TextView).text = item.title
-        (view.findViewById(R.id.url) as TextView).text = item.url
+        (view.findViewById(R.id.pubDate) as TextView).text = article.pubDate
+        (view.findViewById(R.id.title) as TextView).text = article.title
+        (view.findViewById(R.id.url) as TextView).text = article.host
 
-        val textColorRes = if (item.isRead) R.color.gray else R.color.text_color_default
-
+        val textColorRes = if (article.isRead) R.color.gray else R.color.text_color_default
         (view.findViewById(R.id.title) as TextView).setTextColor(ContextCompat.getColor(context, textColorRes))
+
+        val thumbsImageView = (view.findViewById(R.id.thumbs) as ImageView)
+        article.thumbsUrlString?.let {
+            thumbsImageView.visibility = View.VISIBLE
+            Picasso.get().load(it).resize(80, 80).into(thumbsImageView)
+
+        } ?: run {
+            thumbsImageView.visibility = View.GONE
+        }
 
         return view
     }
 
-    fun refresh(newData: ArrayList<T>) {
+    /**
+     * 記事を差し替える
+     */
+    fun refresh(newData: ArrayList<GnewsArticle>) {
         data.clear()
         data = newData
         notifyDataSetChanged()

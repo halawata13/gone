@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GoNe</string>
+    <string name="app_name">Gone</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
 
+    <string name="config_activity_title">設定</string>
     <string name="keyword_management_activity_title">キーワード編集</string>
+    <string name="mute_management_activity_title">ミュート設定</string>
+    <string name="date_range_management_activity_title">記事の取得期間</string>
 
     <string name="loading">loading…</string>
     <string name="loading_fail">記事の読み込みに失敗しました</string>
@@ -16,8 +19,20 @@
     <string name="add">追加</string>
     <string name="cancel">キャンセル</string>
     <string name="confirm">確認</string>
-    <string name="delete">削除</string>
+    <string name="delete">削除する</string>
+    <string name="thumbs">サムネイル</string>
 
     <string name="section_title_keyword">キーワード</string>
     <string name="section_title_topics">トピックス</string>
+    <string name="confirm_delete">削除しますか？</string>
+
+    <string-array name="config_list">
+        <item>@string/keyword_management_activity_title</item>
+        <item>@string/mute_management_activity_title</item>
+        <item>@string/date_range_management_activity_title</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="ok">OK</string>
 </resources>

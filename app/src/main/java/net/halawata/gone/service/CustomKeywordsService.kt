@@ -11,7 +11,7 @@ import java.net.URLEncoder
 class CustomKeywordsService(private val helper: SQLiteOpenHelper) {
 
     fun getAll(): ArrayList<KeywordItem> {
-        val result: ArrayList<KeywordItem> = arrayListOf()
+        val result = arrayListOf<KeywordItem>()
         val db = helper.readableDatabase
         var cursor: Cursor? = null
 
@@ -69,7 +69,7 @@ class CustomKeywordsService(private val helper: SQLiteOpenHelper) {
     companion object {
         fun getUrlString(keyword: String): String {
             val escaped = URLEncoder.encode(keyword, "UTF-8")
-            return "https://news.google.com/news/rss/headlines/section/q/$escaped/$escaped?ned=jp&amp;hl=ja&gl=JP"
+            return "https://news.google.com/rss/search?amp;hl=ja&q=$escaped&hl=ja&gl=JP&ceid=JP:ja"
         }
     }
 }

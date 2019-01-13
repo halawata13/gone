@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteOpenHelper
 import net.halawata.gone.entity.Article
+import net.halawata.gone.entity.GnewsArticle
 import java.lang.Exception
 
 class ReadArticleService(private val helper: SQLiteOpenHelper) {
@@ -20,7 +21,7 @@ class ReadArticleService(private val helper: SQLiteOpenHelper) {
             val values = ContentValues()
             values.put("guid", article.guid)
             values.put("keyword", keyword)
-            db.insert("read_article", null, values)
+            db.insert("read_articles", null, values)
 
             db.setTransactionSuccessful()
 
@@ -34,18 +35,18 @@ class ReadArticleService(private val helper: SQLiteOpenHelper) {
         }
     }
 
-    fun <T: Article> checkReadArticle(articles: ArrayList<T>, keyword: String): ArrayList<T> {
-        val guids = mutableListOf<String>()
+    fun checkReadArticle(articles: List<GnewsArticle>, keyword: String): ArrayList<GnewsArticle> {
+        val guid = mutableListOf<String>()
         val db = helper.readableDatabase
         var cursor: Cursor? = null
 
         try {
-            cursor = db.query("read_article", arrayOf("guid"), "keyword = ?", arrayOf(keyword), null, null, null, null)
+            cursor = db.query("read_articles", arrayOf("guid"), "keyword = ?", arrayOf(keyword), null, null, null, null)
 
             var eol = cursor.moveToFirst()
 
             while (eol) {
-                guids.add(cursor.getString(0))
+                guid.add(cursor.getString(0))
                 eol = cursor.moveToNext()
             }
 
@@ -59,9 +60,9 @@ class ReadArticleService(private val helper: SQLiteOpenHelper) {
         }
 
         return articles.map {
-            it.isRead = guids.contains(it.guid)
+            it.isRead = guid.contains(it.guid)
             it
-        } as ArrayList<T>
+        } as ArrayList<GnewsArticle>
     }
 
     fun deleteKeywords(keywords: List<String>) {
@@ -70,7 +71,7 @@ class ReadArticleService(private val helper: SQLiteOpenHelper) {
 
         try {
             for (keyword in keywords) {
-                db.delete("read_article", "keyword = ?", arrayOf(keyword))
+                db.delete("read_articles", "keyword = ?", arrayOf(keyword))
             }
 
             db.setTransactionSuccessful()

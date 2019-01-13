@@ -1,6 +1,8 @@
 package net.halawata.gone
 
+import android.app.Dialog
 import android.app.PendingIntent
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
@@ -8,11 +10,13 @@ import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.customtabs.CustomTabsIntent
+import android.support.v4.app.DialogFragment
 import android.support.v4.app.LoaderManager
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.Loader
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AlertDialog
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -73,9 +77,10 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AsyncNet
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            RequestCode.KeywordManagementActivity -> {
-                // キーワード編集から戻ってきたらサイドメニューを更新する
+            RequestCode.ConfigActivity -> {
+                // 設定から戻ってきたらサイドメニューと記事を更新する
                 updateSideMenu()
+                requestArticle()
             }
             else -> {
                 super.onActivityResult(requestCode, resultCode, data)
@@ -84,20 +89,17 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AsyncNet
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menu?.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, resources.getString(R.string.keyword_management_activity_title))
-
-        return super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.menu_activity, menu)
+        return true
     }
 
     /**
      * オプションメニュー選択時
      */
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == Menu.FIRST + 1) {
-            val intent = Intent(this, KeywordManagementActivity::class.java)
-            startActivityForResult(intent, RequestCode.KeywordManagementActivity)
-
-            return true
+        if (item?.itemId == R.id.configItem) {
+            val intent = Intent(this, ConfigActivity::class.java)
+            startActivityForResult(intent, RequestCode.ConfigActivity)
         }
 
         if (drawerToggle.onOptionsItemSelected(item)) {
@@ -133,8 +135,10 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AsyncNet
         data?.let {
             it.content?.let { content ->
                 GnewsService.parse(content)?.let { articles ->
-                    val checkedArticle = readArticleService.checkReadArticle(articles, selectedItem!!.keyword)
-                    (listFragment as? ListFragment)?.setArticles(checkedArticle)
+                    var parsedArticles = readArticleService.checkReadArticle(articles, selectedItem!!.keyword)
+                    parsedArticles = MuteService(DatabaseHelper(this)).filter(parsedArticles)
+                    parsedArticles = DateRangeService(DatabaseHelper(this)).filter(parsedArticles)
+                    (listFragment as? ListFragment)?.setArticles(parsedArticles)
                 }
             }
         }
@@ -166,7 +170,6 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AsyncNet
 
         val customTabsIntent = CustomTabsIntent.Builder()
                 .setShowTitle(true)
-                .setToolbarColor(ContextCompat.getColor(this, R.color.gnews))
                 .setStartAnimations(this, android.R.anim.fade_in, android.R.anim.fade_out)
                 .setExitAnimations(this, android.R.anim.fade_in, android.R.anim.fade_out)
                 .setCloseButtonIcon(BitmapFactory.decodeResource(this.resources, R.drawable.baseline_arrow_back_white_24))
@@ -238,7 +241,8 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AsyncNet
 
     companion object {
         object RequestCode {
-            const val KeywordManagementActivity = 0
+            const val ConfigActivity = 0
+            const val KeywordManagementActivity = 1
         }
     }
 }

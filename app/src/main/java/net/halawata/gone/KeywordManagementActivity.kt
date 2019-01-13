@@ -35,6 +35,8 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_keyword_management)
 
         supportActionBar?.title = getString(R.string.keyword_management_activity_title)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_white_24)
 
         val helper = DatabaseHelper(this)
         keywordsService = CustomKeywordsService(helper)
@@ -91,29 +93,17 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
         keywordAddButton.setOnClickListener(this)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_keyword_management, menu)
-        return true
-    }
-
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        // 保存ボタンタップ時
-        if (item?.itemId == R.id.keywordManagementMenuSaveItem) {
-            try {
-                keywordsService.updateAll(keywordRecyclerViewAdapter.data)
-                readArticleService.deleteKeywords(deletedItem.distinct())
-
-                showMessage("保存しました")
+        return when (item?.itemId) {
+            // 画面上の戻るボタンタップ時
+            android.R.id.home -> {
                 finish()
-
-            } catch (ex: Exception) {
-                showMessage("保存に失敗しました")
+                true
             }
-
-            return true
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
     /**
@@ -122,6 +112,22 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(view: View?) {
         val dialog = KeywordAdditionFragment()
         dialog.show(supportFragmentManager, KeywordAdditionFragment::class.java.simpleName)
+    }
+
+    /**
+     * 戻るボタンタップ時
+     */
+    override fun finish() {
+        // 戻るときに保存する
+        try {
+            keywordsService.updateAll(keywordRecyclerViewAdapter.data)
+            readArticleService.deleteKeywords(deletedItem.distinct())
+
+        } catch (ex: Exception) {
+            showMessage("保存に失敗しました")
+        }
+
+        super.finish()
     }
 
     /**
@@ -190,6 +196,7 @@ class KeywordManagementActivity : AppCompatActivity(), View.OnClickListener {
 
             builder
                     .setTitle(getString(R.string.confirm))
+                    .setMessage(getString(R.string.confirm_delete))
                     .setPositiveButton(getString(R.string.delete)) { _, _ ->
                         arguments?.getInt("position")?.let {
                             activity.onKeywordClear(it)
