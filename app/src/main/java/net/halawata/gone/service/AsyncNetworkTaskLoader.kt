@@ -2,7 +2,7 @@ package net.halawata.gone.service
 
 import android.content.Context
 import android.net.Uri
-import android.support.v4.content.AsyncTaskLoader
+import androidx.loader.content.AsyncTaskLoader
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL

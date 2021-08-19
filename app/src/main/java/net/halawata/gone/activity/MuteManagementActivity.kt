@@ -1,6 +1,6 @@
 package net.halawata.gone.activity
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import net.halawata.gone.R
@@ -16,8 +16,8 @@ class MuteManagementActivity : AppCompatActivity() {
         supportActionBar?.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_white_24)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
             // 画面上の戻るボタンタップ時
             android.R.id.home -> {
                 finish()

@@ -2,7 +2,7 @@ package net.halawata.gone.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +27,7 @@ class ConfigFragment : Fragment(), AdapterView.OnItemClickListener {
         val view = inflater.inflate(R.layout.fragment_config, container, false)
         val activity = activity ?: return view
 
-        val adapter = ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1, resources.getStringArray(R.array.config_list))
+        val adapter = ArrayAdapter(activity, android.R.layout.simple_list_item_1, resources.getStringArray(R.array.config_list))
         val configListView = view.findViewById<ListView>(R.id.configListView)
         configListView.adapter = adapter
         configListView.onItemClickListener = this
@@ -44,7 +44,6 @@ class ConfigFragment : Fragment(), AdapterView.OnItemClickListener {
     override fun onItemClick(parent: AdapterView<*>?, v: View?, position: Int, id: Long) {
         val text = resources.getStringArray(R.array.config_list)[position]
         onItemClicked(text)
-
     }
 
     private fun onItemClicked(text: String) {

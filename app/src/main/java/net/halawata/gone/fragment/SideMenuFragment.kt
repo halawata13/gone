@@ -2,12 +2,11 @@ package net.halawata.gone.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ExpandableListView
-import kotlinx.android.synthetic.main.fragment_side_menu.*
 import net.halawata.gone.R
 import net.halawata.gone.entity.SideMenuItem
 import net.halawata.gone.service.SideMenuService
@@ -18,23 +17,23 @@ class SideMenuFragment : Fragment(), ExpandableListView.OnChildClickListener, Ex
     private var selectedItem: SideMenuItem? = null
     private var listener: OnSideMenuFragmentListener? = null
     private var drawerListAdapter: DrawerListAdapter? = null
+    private lateinit var drawerListView: ExpandableListView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_side_menu, container, false)
-        val activity = activity ?: return view
-        val drawerListView = view.findViewById<ExpandableListView>(R.id.drawerListView)
+        return inflater.inflate(R.layout.fragment_side_menu, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val activity = activity ?: return
+        drawerListView = view.findViewById(R.id.drawerListView)
 
         drawerListAdapter = DrawerListAdapter(activity, arrayListOf(), arrayListOf(arrayListOf()), R.layout.drawer_section_item, R.layout.drawer_list_item).also {
             drawerListView.setAdapter(it)
             drawerListView.setOnChildClickListener(this)
             drawerListView.setOnGroupClickListener(this)
         }
-
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
         updateSideMenu()
         onSideMenuSelected()

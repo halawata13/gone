@@ -1,27 +1,40 @@
 package net.halawata.gone.activity
 
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.support.customtabs.CustomTabsIntent
-import android.support.v7.app.ActionBarDrawerToggle
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.appcompat.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import kotlinx.android.synthetic.main.activity_main.*
 import net.halawata.gone.R
 import net.halawata.gone.entity.Article
 import net.halawata.gone.entity.SideMenuItem
 import net.halawata.gone.fragment.ListFragment
+import net.halawata.gone.fragment.ListFragmentDelegate
 import net.halawata.gone.fragment.SideMenuFragment
 
-class MainActivity : AppCompatActivity(), SideMenuFragment.OnSideMenuFragmentListener {
+class MainActivity : AppCompatActivity(), SideMenuFragment.OnSideMenuFragmentListener, ListFragmentDelegate {
 
     private lateinit var drawerToggle: ActionBarDrawerToggle
+
+    private val startForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
+            if (result?.resultCode == Activity.RESULT_OK) {
+                // 設定から戻ってきたらサイドメニューと記事を更新する
+                (sideMenuFragment as? SideMenuFragment)?.updateSideMenu()
+                (listFragment as? ListFragment)?.requestArticle()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,19 +56,6 @@ class MainActivity : AppCompatActivity(), SideMenuFragment.OnSideMenuFragmentLis
         drawerLayout.addDrawerListener(drawerToggle)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            RequestCode.ConfigActivity -> {
-                // 設定から戻ってきたらサイドメニューと記事を更新する
-                (sideMenuFragment as? SideMenuFragment)?.updateSideMenu()
-                (listFragment as? ListFragment)?.requestArticle()
-            }
-            else -> {
-                super.onActivityResult(requestCode, resultCode, data)
-            }
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_activity, menu)
         return true
@@ -64,11 +64,11 @@ class MainActivity : AppCompatActivity(), SideMenuFragment.OnSideMenuFragmentLis
     /**
      * オプションメニュー選択時
      */
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // 設定画面へ
-        if (item?.itemId == R.id.configItem) {
+        if (item.itemId == R.id.configItem) {
             val intent = Intent(this, ConfigActivity::class.java)
-            startActivityForResult(intent, RequestCode.ConfigActivity)
+            startForResult.launch(intent)
         }
 
         if (drawerToggle.onOptionsItemSelected(item)) {
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity(), SideMenuFragment.OnSideMenuFragmentLis
         drawerToggle.syncState()
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         drawerToggle.onConfigurationChanged(newConfig)
     }
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity(), SideMenuFragment.OnSideMenuFragmentLis
     /**
      * 記事選択時
      */
-    fun onClickArticle(article: Article) {
+    override fun onClickArticle(article: Article) {
         val uri = Uri.parse(article.url) ?: return
         //val item = selectedItem ?: return
         //readArticleService.readArticle(article, item.keyword)

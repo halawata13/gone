@@ -3,7 +3,6 @@ package net.halawata.gone.service
 import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteOpenHelper
-import net.halawata.gone.entity.Article
 import net.halawata.gone.entity.GnewsArticle
 import java.lang.Exception
 

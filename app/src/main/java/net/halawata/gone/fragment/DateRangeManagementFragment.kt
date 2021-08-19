@@ -2,7 +2,7 @@ package net.halawata.gone.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,7 +29,7 @@ class DateRangeManagementFragment : Fragment(), AdapterView.OnItemClickListener 
         val dateRangeService = dateRangeService ?: return view
 
         val dateRange = dateRangeService.get()
-        val adapter = ArrayAdapter<String>(activity, android.R.layout.simple_list_item_single_choice, dateRangeService.getDateRangeValue())
+        val adapter = ArrayAdapter(activity, android.R.layout.simple_list_item_single_choice, dateRangeService.getDateRangeValue())
         val dateRangeListView = view.findViewById<ListView>(R.id.dateRangeListView)
 
         dateRangeListView.adapter = adapter

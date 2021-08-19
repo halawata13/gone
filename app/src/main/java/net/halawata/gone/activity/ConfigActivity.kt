@@ -1,7 +1,8 @@
 package net.halawata.gone.activity
 
+import android.app.Activity
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import net.halawata.gone.R
@@ -16,6 +17,8 @@ class ConfigActivity : AppCompatActivity(), ConfigFragment.OnItemClickListener {
         supportActionBar?.title = getString(R.string.config_activity_title)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_white_24)
+
+        setResult(Activity.RESULT_OK)
     }
 
     override fun onItemClick(text: String) {
@@ -30,8 +33,8 @@ class ConfigActivity : AppCompatActivity(), ConfigFragment.OnItemClickListener {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
             finish()
             return true
         }

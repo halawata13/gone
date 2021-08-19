@@ -2,7 +2,7 @@ package net.halawata.gone.view
 
 import android.app.Activity
 import android.content.Context
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
@@ -28,19 +28,10 @@ class ArticleListAdapter(val context: Context, var data: ArrayList<GnewsArticle>
 
         (view.findViewById(R.id.pubDate) as TextView).text = article.pubDate
         (view.findViewById(R.id.title) as TextView).text = article.title
-        (view.findViewById(R.id.url) as TextView).text = article.host
+        (view.findViewById(R.id.url) as TextView).text = article.source
 
         val textColorRes = if (article.isRead) R.color.gray else R.color.text_color_default
         (view.findViewById(R.id.title) as TextView).setTextColor(ContextCompat.getColor(context, textColorRes))
-
-        val thumbsImageView = (view.findViewById(R.id.thumbs) as ImageView)
-        article.thumbsUrlString?.let {
-            thumbsImageView.visibility = View.VISIBLE
-            Picasso.get().load(it).resize(80, 80).into(thumbsImageView)
-
-        } ?: run {
-            thumbsImageView.visibility = View.GONE
-        }
 
         return view
     }

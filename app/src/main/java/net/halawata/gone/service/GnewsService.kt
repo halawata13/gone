@@ -4,8 +4,6 @@ import net.halawata.gone.entity.GnewsArticle
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.StringReader
-import java.net.URL
-import java.net.URLEncoder
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -14,7 +12,7 @@ object GnewsService {
 
     private const val dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
 
-    fun parse(content: String): ArrayList<GnewsArticle>? {
+    fun parse(content: String): ArrayList<GnewsArticle> {
         val factory = XmlPullParserFactory.newInstance()
         val parser = factory.newPullParser()
         parser.setInput(StringReader(content))
@@ -28,8 +26,8 @@ object GnewsService {
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 var title = ""
                 var url = ""
+                var source = ""
                 var host = ""
-                var thumbsUrlString: String? = null
                 var guid = ""
                 var pubDate = ""
 
@@ -54,7 +52,6 @@ object GnewsService {
                         while (eventType != XmlPullParser.END_TAG || parser.name != "link") {
                             if (eventType == XmlPullParser.TEXT) {
                                 url = parser.text
-                                host = URL(url).host
                             }
 
                             eventType = parser.next()
@@ -81,12 +78,22 @@ object GnewsService {
                         }
                     }
 
-                    if (eventType == XmlPullParser.START_TAG && parser.name == "media:content") {
+                    if (eventType == XmlPullParser.START_TAG && parser.name == "source") {
                         for (i in 0 until parser.attributeCount) {
                             if (parser.getAttributeName(i) == "url") {
-                                thumbsUrlString = parser.getAttributeValue(i)
+                                host = parser.getAttributeValue(i)
                                 break
                             }
+
+                            eventType = parser.next()
+                        }
+
+                        while (eventType != XmlPullParser.END_TAG || parser.name != "source") {
+                            if (eventType == XmlPullParser.TEXT) {
+                                source = parser.text
+                            }
+
+                            eventType = parser.next()
                         }
                     }
 
@@ -97,8 +104,8 @@ object GnewsService {
                         id = id++,
                         title = title,
                         url = url,
+                        source = source,
                         host = host,
-                        thumbsUrlString = thumbsUrlString,
                         pubDate = pubDate,
                         guid = guid
                 )
@@ -121,8 +128,8 @@ object GnewsService {
         return try {
             val inFormat = SimpleDateFormat(dateFormat, Locale.US)
             val outFormat = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US)
-
-            outFormat.format(inFormat.parse(dateString))
+            val parsed = inFormat.parse(dateString) ?: return null
+            outFormat.format(parsed)
 
         } catch (ex: ParseException) {
             ex.printStackTrace()

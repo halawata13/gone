@@ -4,20 +4,21 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
-import android.support.v4.app.Fragment
-import android.support.v4.app.LoaderManager
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.Loader
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
+import androidx.loader.app.LoaderManager
+import androidx.core.content.ContextCompat
+import androidx.loader.content.Loader
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.TextView
+import androidx.fragment.app.setFragmentResultListener
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_list.*
 import net.halawata.gone.R
@@ -37,7 +38,7 @@ class ListFragment : Fragment(), LoaderManager.LoaderCallbacks<AsyncNetworkTaskL
     private var selectedItem: SideMenuItem? = null
     private var listener: OnListFragmentListener? = null
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
 
         delegate = context as? ListFragmentDelegate
@@ -70,7 +71,7 @@ class ListFragment : Fragment(), LoaderManager.LoaderCallbacks<AsyncNetworkTaskL
             }
 
             dialog.arguments = arguments
-            dialog.setTargetFragment(this, 0)
+//            dialog.setTargetFragment(this, 0)
             dialog.show(activity.supportFragmentManager, ArticleOptionDialogFragment::class.java.simpleName)
 
             true
@@ -79,11 +80,17 @@ class ListFragment : Fragment(), LoaderManager.LoaderCallbacks<AsyncNetworkTaskL
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         LoaderManager.getInstance(this).getLoader<AsyncNetworkTaskLoader>(0)?.let {
             requestArticle()
+        }
+
+        setFragmentResultListener("mute") { _, data ->
+            data.getString("host")?.let {
+                muteSite(it)
+            }
         }
     }
 
@@ -135,7 +142,7 @@ class ListFragment : Fragment(), LoaderManager.LoaderCallbacks<AsyncNetworkTaskL
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<AsyncNetworkTaskLoader.Response> {
         val urlString = args?.getString("urlString", null) ?: ""
 
-        return AsyncNetworkTaskLoader(activity!!, urlString, "GET")
+        return AsyncNetworkTaskLoader(requireActivity(), urlString, "GET")
     }
 
     /**
@@ -145,7 +152,7 @@ class ListFragment : Fragment(), LoaderManager.LoaderCallbacks<AsyncNetworkTaskL
         val activity = activity ?: return
 
         data?.content?.let { content ->
-            GnewsService.parse(content)?.let { articles ->
+            GnewsService.parse(content).let { articles ->
                 var parsedArticles = ReadArticleService(DatabaseHelper(activity)).checkReadArticle(articles, selectedItem!!.keyword)
                 parsedArticles = MuteService(DatabaseHelper(activity)).filter(parsedArticles)
                 parsedArticles = DateRangeService(DatabaseHelper(activity)).filter(parsedArticles)
@@ -204,12 +211,10 @@ class ListFragment : Fragment(), LoaderManager.LoaderCallbacks<AsyncNetworkTaskL
             builder
                     .setTitle(host)
                     .setItems(arrayOf("このサイトをミュートする"), DialogInterface.OnClickListener { _, which ->
-                        when (which) {
-                            0 -> {
-                                (targetFragment as? ListFragment)?.muteSite(host)
-                            }
-                            else -> return@OnClickListener
+                        val bundle = Bundle().apply {
+                            putString("host", host)
                         }
+                        parentFragmentManager.setFragmentResult("mute", bundle)
                     })
                     .setNegativeButton(getString(R.string.cancel), null)
 

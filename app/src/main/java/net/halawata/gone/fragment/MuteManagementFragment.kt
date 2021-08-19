@@ -3,11 +3,11 @@ package net.halawata.gone.fragment
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
-import android.support.v4.app.Fragment
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,7 +51,8 @@ class MuteManagementFragment : Fragment() {
             }
         }
 
-        val linearLayoutManager = LinearLayoutManager(activity)
+        val linearLayoutManager =
+            LinearLayoutManager(activity)
 
         muteRecyclerView = view.findViewById(R.id.muteRecyclerView)
         muteRecyclerView.layoutManager = linearLayoutManager
@@ -68,7 +69,7 @@ class MuteManagementFragment : Fragment() {
             muteService?.updateAll(muteRecyclerViewAdapter.data)
 
         } catch (ex: Exception) {
-            showMessage("保存に失敗しました")
+            showMessage()
         }
     }
 
@@ -90,9 +91,9 @@ class MuteManagementFragment : Fragment() {
     /**
      * メッセージ表示
      */
-    private fun showMessage(message: String) {
+    private fun showMessage() {
         val activity = activity ?: return
-        Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
+        Toast.makeText(activity, getString(R.string.save_fail), Toast.LENGTH_LONG).show()
     }
 
     /**
